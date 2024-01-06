@@ -17,7 +17,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     # project apps
-
+    'home',
+    'account',
+    'payment',
+    'product',
 ]
 
 MIDDLEWARE = [
