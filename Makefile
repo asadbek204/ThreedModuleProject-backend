@@ -1,6 +1,13 @@
-.PHONY: default clear migrate
+.PHONY: default push
 
-default: clear migrate
+default: push
+ifndef $(m)
+	@echo "please enter commit"
+	exit 1
+else
+	commit = m
+endif
+
 
 clear:
 	rm account/migrations/*.py
