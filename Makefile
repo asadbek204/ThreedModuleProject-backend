@@ -1,12 +1,6 @@
 .PHONY: default push
 
 default: push
-ifndef $(m)
-	@echo "please enter commit"
-	exit 1
-else
-	commit = m
-endif
 
 
 clear:
@@ -26,6 +20,10 @@ migrate:
 	./manage.py createsuperuser --username admin --password 2004 --noinput --email 'ahikmatullayev024@gmail.com'
 
 push:
+	@echo "a"
+ifndef m
+	$(error "please enter commit")
+endif
 	git add .
-	git commit -m $(commit)
+	git commit -m $(m)
 	git push
