@@ -7,7 +7,7 @@ class User(AbstractUser):
     email = EmailField(unique=True, verbose_name=_('email'))
     password = CharField(max_length=256, verbose_name=_('password'))
     gender = BooleanField(default=True, verbose_name=_('gender'))
-    REQUIRED_FIELDS = ['email', 'username', 'password']
+    REQUIRED_FIELDS = ['email', 'password']
     photo = ImageField(upload_to='profile_pics', null=True, blank=True, verbose_name=_('profile photo'))
     phone = CharField(max_length=13, unique=True, verbose_name=_('phone'))
 

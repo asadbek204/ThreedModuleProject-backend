@@ -3,7 +3,7 @@ from account.models import User
 
 
 class Wallet(Model):
-    user = OneToOneField(User, on_delete=CASCADE)
+    user = OneToOneField(User, on_delete=CASCADE, related_name='wallets')
     balance = PositiveIntegerField(default=0, null=True, blank=True, verbose_name="balance")
     token = CharField(max_length=256, null=True, blank=True, unique=True)
 
@@ -17,7 +17,7 @@ class Wallet(Model):
 
 
 class Card(Model):
-    user = OneToOneField(User, on_delete=CASCADE)
+    user = OneToOneField(User, on_delete=CASCADE, related_name='cards')
     number = CharField(max_length=32, unique=True, verbose_name="number")
     owner = CharField(max_length=128, verbose_name="owner")
     name = CharField(max_length=32, verbose_name="name")
@@ -33,17 +33,17 @@ class Card(Model):
 
 
 class Order(Model):
-    user = OneToOneField(User, on_delete=CASCADE)
-    product = ForeignKey('product.Product', on_delete=CASCADE, verbose_name="product")
+    user = OneToOneField(User, on_delete=CASCADE, related_name='orders')
+    product = ForeignKey('product.Product', on_delete=CASCADE, verbose_name="product", related_name="orders")
     quantity = PositiveSmallIntegerField(verbose_name="quantity")
     total = PositiveIntegerField(verbose_name="total")
 
 
 class Payment(Model):
-    user = OneToOneField(User, on_delete=CASCADE)
-    card = OneToOneField(Card, on_delete=DO_NOTHING, null=True, blank=True, verbose_name="card")
-    wallet = OneToOneField(Wallet, on_delete=DO_NOTHING, null=True, blank=True, verbose_name="wallet")
-    order = OneToOneField(Order, on_delete=DO_NOTHING, verbose_name="order")
+    user = OneToOneField(User, on_delete=CASCADE, related_name='payments')
+    card = OneToOneField(Card, on_delete=DO_NOTHING, null=True, blank=True, verbose_name="card", related_name="card_payments")
+    wallet = OneToOneField(Wallet, on_delete=DO_NOTHING, null=True, blank=True, verbose_name="wallet", related_name="wallet_payments")
+    order = OneToOneField(Order, on_delete=DO_NOTHING, verbose_name="order", related_name="order_payments")
     from_wallet = PositiveIntegerField(verbose_name="amount from wallet")
     from_card = PositiveIntegerField(verbose_name="amount from card")
 

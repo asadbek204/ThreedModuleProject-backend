@@ -113,7 +113,7 @@ class Parameter(Model):
 
 
 class ProductReview(Reviews):
-    user = ForeignKey(User, on_delete=CASCADE, related_name='reviews')
+    user = ForeignKey(User, on_delete=CASCADE, related_name='product_reviews')
     product = ForeignKey(Product, on_delete=CASCADE, related_name='reviews')
     is_bought = BooleanField(default=False)
 

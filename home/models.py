@@ -2,15 +2,32 @@ from django.db.models import *
 from account.models import Employee, User
 
 
+class WorkingTime(Model):
+    from_time = TimeField()
+    to_time = TimeField()
+    is_active = BooleanField(default=True)
+
+    def __str__(self):
+        return self.from_time.strftime('') + ' - ' + self.to_time.strftime('')
+
+    class Meta:
+        verbose_name = 'working time'
+        verbose_name_plural = 'working times'
+        db_table = 'working_time'
+
+
 class SiteInfo(Model):
     site_title = CharField(
         max_length=128,
-        default='Terra Pro: Clothing store in Tashkent ≡ Men\'s and women\'s clothing on Terrapro.uz')
+        default='Terra Pro: Clothing store in Tashkent ≡ Men\'s and women\'s clothing on Terrapro.uz', blank=True)
     site_icon = ImageField(upload_to='info/site/')
     site_description = TextField(
         default='Terra Pro - Manufacturer of men\'s and women\'s clothing at competitive prices ⭐️ Clothing store in '
-                'Uzbekistan ✔️ Trying on and fast delivery of clothes ☎ +998 71 2509391 | Clothing store Terrapro.uz'
+                'Uzbekistan ✔️ Trying on and fast delivery of clothes ☎ +998 71 2509391 | Clothing store Terrapro.uz',
+        blank=True
     )
+    work_time = OneToOneField(WorkingTime, on_delete=CASCADE, related_name='site_info', verbose_name='work time')
+    is_active = BooleanField(default=True)
 
     def __str__(self):
         return self.site_title
@@ -26,9 +43,10 @@ class ClientsInfo(Model):
     online = PositiveIntegerField(default=0)
     reviews = PositiveIntegerField(default=0)
     mid_rate = PositiveSmallIntegerField(default=0)
+    date = DateField(auto_now=False, auto_now_add=False)
 
     def __str__(self):
-        return self.users
+        return f"{self.users}"
 
     class Meta:
         verbose_name = 'clients info'
@@ -51,24 +69,9 @@ class CompanyInfo(Model):
         db_table = 'company_info'
 
 
-class WorkingTime(Model):
-    site = ForeignKey(SiteInfo, on_delete=CASCADE)
-    from_time = TimeField()
-    to_time = TimeField()
-    is_active = BooleanField(default=True)
-
-    def __str__(self):
-        return self.from_time.strftime('') + ' - ' + self.to_time.strftime('')
-
-    class Meta:
-        verbose_name = 'working time'
-        verbose_name_plural = 'working times'
-        db_table = 'working_time'
-
-
 class Contact(Model):
-    employee = ForeignKey(Employee, on_delete=CASCADE)
-    site = ForeignKey(SiteInfo, on_delete=CASCADE)
+    employee = ForeignKey(Employee, on_delete=CASCADE, related_name='employees_contacts')
+    site = ForeignKey(SiteInfo, on_delete=CASCADE, related_name='contacts')
 
     def __str__(self):
         return self.employee.user.phone
@@ -80,7 +83,6 @@ class Contact(Model):
 
 
 class Reviews(Model):
-    user = ForeignKey(User, on_delete=CASCADE, related_name='reviews')
     stars = IntegerField(default=0)
     comment = TextField()
     date = DateTimeField(auto_now_add=True)
@@ -93,6 +95,7 @@ class Reviews(Model):
 
 
 class SiteReviews(Reviews):
+    user = ForeignKey(User, on_delete=CASCADE, related_name='site_reviews')
     site = ForeignKey(SiteInfo, on_delete=CASCADE)
 
     class Meta:
