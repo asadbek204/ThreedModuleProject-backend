@@ -6,7 +6,7 @@ class SiteInfo(Model):
     site_title = CharField(
         max_length=128,
         default='Terra Pro: Clothing store in Tashkent ≡ Men\'s and women\'s clothing on Terrapro.uz')
-    site_icon = ImageField(upload_to='')
+    site_icon = ImageField(upload_to='info/site/')
     site_description = TextField(
         default='Terra Pro - Manufacturer of men\'s and women\'s clothing at competitive prices ⭐️ Clothing store in '
                 'Uzbekistan ✔️ Trying on and fast delivery of clothes ☎ +998 71 2509391 | Clothing store Terrapro.uz'
@@ -68,7 +68,7 @@ class WorkingTime(Model):
 
 class Contact(Model):
     employee = ForeignKey(Employee, on_delete=CASCADE)
-    site_info = ForeignKey(SiteInfo, on_delete=CASCADE)
+    site = ForeignKey(SiteInfo, on_delete=CASCADE)
 
     def __str__(self):
         return self.employee.user.phone
@@ -93,6 +93,7 @@ class Reviews(Model):
 
 
 class SiteReviews(Reviews):
+    site = ForeignKey(SiteInfo, on_delete=CASCADE)
 
     class Meta:
         verbose_name = 'Site Review'

@@ -1,5 +1,6 @@
 from django.db.models import *
 
+from account.models import User
 from home.models import Reviews
 
 
@@ -44,7 +45,7 @@ class Material(Model):
 
 class Compound(Model):
     name = CharField(max_length=16, verbose_name="compound")
-    percentage = PositiveSmallIntegerField()
+    percentage = CharField(max_length=4, verbose_name="percentage")
     material = ForeignKey(Material, on_delete=CASCADE, related_name='compounds')
 
     def __str__(self):
@@ -112,7 +113,8 @@ class Parameter(Model):
 
 
 class ProductReview(Reviews):
-    product = ForeignKey(Product, on_delete=CASCADE)
+    user = ForeignKey(User, on_delete=CASCADE, related_name='reviews')
+    product = ForeignKey(Product, on_delete=CASCADE, related_name='reviews')
     is_bought = BooleanField(default=False)
 
     class Meta:
