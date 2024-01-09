@@ -74,6 +74,7 @@ class Product(Model):
     updated_at = DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_("update date"))
     category = ForeignKey(SubCatalog, on_delete=CASCADE, related_name='products', verbose_name=_("category"))
     material = ForeignKey(Material, on_delete=CASCADE, related_name='material_products', verbose_name=_("material"))
+    site_only = BooleanField(default=False, verbose_name=_("site only"))
     description = TextField(verbose_name=_("description"))
 
     def __str__(self):
