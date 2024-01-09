@@ -1,5 +1,6 @@
 from django.db.models import *
 from account.models import Employee, User
+from django.utils.translation import gettext_lazy as _
 
 
 class WorkingTime(Model):
@@ -19,14 +20,17 @@ class WorkingTime(Model):
 class SiteInfo(Model):
     site_title = CharField(
         max_length=128,
-        default='Terra Pro: Clothing store in Tashkent ≡ Men\'s and women\'s clothing on Terrapro.uz', blank=True)
+        default=_('Terra Pro: Clothing store in Tashkent ≡ Men\'s and women\'s clothing on Terrapro.uz'), blank=True)
     site_icon = ImageField(upload_to='info/site/')
     site_description = TextField(
-        default='Terra Pro - Manufacturer of men\'s and women\'s clothing at competitive prices ⭐️ Clothing store in '
-                'Uzbekistan ✔️ Trying on and fast delivery of clothes ☎ +998 71 2509391 | Clothing store Terrapro.uz',
+        default=_(
+            'Terra Pro - Manufacturer of men\'s and women\'s clothing at competitive prices ⭐️ Clothing store in'
+            'Uzbekistan ✔️ Trying on and fast delivery of clothes ☎ +998 71 2509391 | Clothing store Terrapro.uz'
+        ),
         blank=True
     )
-    work_time = OneToOneField(WorkingTime, on_delete=CASCADE, related_name='site_info', verbose_name='work time')
+    work_time = OneToOneField(WorkingTime, on_delete=CASCADE, related_name='site_info', verbose_name=_('work time'))
+    phone = CharField(max_length=13, default='+998712509391')
     is_active = BooleanField(default=True)
 
     def __str__(self):
@@ -39,11 +43,11 @@ class SiteInfo(Model):
 
 
 class ClientsInfo(Model):
-    users = PositiveIntegerField(default=0)
-    online = PositiveIntegerField(default=0)
-    reviews = PositiveIntegerField(default=0)
-    mid_rate = PositiveSmallIntegerField(default=0)
-    date = DateField(auto_now=False, auto_now_add=False)
+    users = PositiveIntegerField(default=0, verbose_name=_('quantity of users'))
+    online = PositiveIntegerField(default=0, verbose_name=_('online user'))
+    reviews = PositiveIntegerField(default=0, verbose_name=_('quantity of review'))
+    mid_rate = PositiveSmallIntegerField(default=0, verbose_name=_('average rate'))
+    date = DateField(auto_now=False, auto_now_add=False, verbose_name=_('month'))
 
     def __str__(self):
         return f"{self.users}"
@@ -56,8 +60,8 @@ class ClientsInfo(Model):
 
 class CompanyInfo(Model):
     description = TextField()
-    photo = ImageField(upload_to='company/photos/', blank=True, null=True)
-    html_page = FileField(upload_to='company/pages/', blank=True, null=True)
+    photo = ImageField(upload_to='company/photos/', blank=True, null=True, verbose_name=_('company logo'))
+    html_page = FileField(upload_to='company/pages/', blank=True, null=True, verbose_name=_('company page'))
     is_active = BooleanField(default=True)
 
     def __str__(self):
@@ -70,11 +74,11 @@ class CompanyInfo(Model):
 
 
 class Contact(Model):
-    employee = ForeignKey(Employee, on_delete=CASCADE, related_name='employees_contacts')
+    employee = ForeignKey(Employee, on_delete=CASCADE, related_name='employees_contacts', verbose_name=_('employee'))
     site = ForeignKey(SiteInfo, on_delete=CASCADE, related_name='contacts')
 
     def __str__(self):
-        return self.employee.user.phone
+        return self.employee.user.username
 
     class Meta:
         verbose_name = 'contact'
@@ -88,14 +92,14 @@ class Reviews(Model):
     date = DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return self.comment[:10]
 
     class Meta:
         abstract = True
 
 
 class SiteReviews(Reviews):
-    user = ForeignKey(User, on_delete=CASCADE, related_name='site_reviews')
+    user = ForeignKey(User, on_delete=CASCADE, related_name='site_reviews', verbose_name=_('user'))
     site = ForeignKey(SiteInfo, on_delete=CASCADE)
 
     class Meta:

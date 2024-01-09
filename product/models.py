@@ -1,12 +1,12 @@
 from django.db.models import *
-
 from account.models import User
 from home.models import Reviews
+from django.utils.translation import gettext_lazy as _
 
 
 class Catalog(Model):
-    name = CharField(max_length=64, verbose_name="catalog")
-    gender = BooleanField(default=True)
+    name = CharField(max_length=64, verbose_name=_("catalog"))
+    gender = BooleanField(default=True, verbose_name="gender")
 
     def __str__(self):
         return self.name
@@ -18,8 +18,9 @@ class Catalog(Model):
 
 
 class SubCatalog(Model):
-    name = CharField(max_length=64, verbose_name="sub catalog")
+    name = CharField(max_length=64, verbose_name=_("sub catalog"))
     catalog = ForeignKey(Catalog, on_delete=CASCADE, related_name='sub_catalogs')
+    description = TextField(verbose_name=_("description"))
 
     def __str__(self):
         return self.name
@@ -30,9 +31,15 @@ class SubCatalog(Model):
         db_table = "sub_catalog"
 
 
+class Description(Model):
+    title = CharField(max_length=128, verbose_name=_("title"))
+    description = TextField(verbose_name=_("description"))
+    category = ForeignKey(SubCatalog, on_delete=CASCADE, related_name='descriptions')
+
+
 class Material(Model):
-    name = CharField(max_length=32, verbose_name="name of material")
-    fit = CharField(max_length=32)
+    name = CharField(max_length=32, verbose_name=_("material"))
+    fit = CharField(max_length=32, verbose_name=_("fit"))
 
     def __str__(self):
         return self.name
@@ -44,9 +51,9 @@ class Material(Model):
 
 
 class Compound(Model):
-    name = CharField(max_length=16, verbose_name="compound")
-    percentage = CharField(max_length=4, verbose_name="percentage")
-    material = ForeignKey(Material, on_delete=CASCADE, related_name='compounds')
+    name = CharField(max_length=16, verbose_name=_("compound"))
+    percentage = PositiveSmallIntegerField(verbose_name=_("percentage"))
+    material = ForeignKey(Material, on_delete=CASCADE, related_name=_('compounds'))
 
     def __str__(self):
         return self.name
@@ -58,15 +65,16 @@ class Compound(Model):
 
 
 class Product(Model):
-    name = CharField(max_length=64, verbose_name="product")
-    price = PositiveIntegerField(verbose_name="price")
-    discount = PositiveIntegerField(default=0, null=True, blank=True, verbose_name="discount")
+    name = CharField(max_length=64, verbose_name=_("product"))
+    price = PositiveIntegerField(verbose_name=_("price"))
+    prev_price = PositiveIntegerField(verbose_name=_("previous price"), null=True, blank=True)
+    discount = PositiveIntegerField(default=0, null=True, blank=True, verbose_name=_("discount"))
     style = CharField(max_length=64, verbose_name="style")
-    created_at = DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name="creation date")
-    updated_at = DateTimeField(auto_now=True, null=True, blank=True, verbose_name="update date")
-    category = ForeignKey(SubCatalog, on_delete=CASCADE, related_name='products', verbose_name="category")
-    material = ForeignKey(Material, on_delete=CASCADE, related_name='material_products', verbose_name="material")
-    description = TextField(verbose_name="description")
+    created_at = DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_("creation date"))
+    updated_at = DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_("update date"))
+    category = ForeignKey(SubCatalog, on_delete=CASCADE, related_name='products', verbose_name=_("category"))
+    material = ForeignKey(Material, on_delete=CASCADE, related_name='material_products', verbose_name=_("material"))
+    description = TextField(verbose_name=_("description"))
 
     def __str__(self):
         return self.name
@@ -77,14 +85,12 @@ class Product(Model):
         db_table = "product"
 
 
-def get_upload_to(*args):
-    print(args)
-    # return path.join(self.product.category.name, self.product.name)
-    return 'products/'
+def upload_to_path(instance, filename):
+    return f'images/{instance.product.name}/{filename}'
 
 
 class Images(Model):
-    image = ImageField(upload_to=get_upload_to, verbose_name="image")
+    image = ImageField(upload_to=upload_to_path, verbose_name="image")
     product = ForeignKey(Product, on_delete=CASCADE, related_name='images')
     is_main = BooleanField(default=False)
 
@@ -98,10 +104,10 @@ class Images(Model):
 
 
 class Parameter(Model):
-    size = CharField(max_length=8, verbose_name="size")
-    color = CharField(max_length=8, verbose_name="color")
-    available = PositiveSmallIntegerField(verbose_name="available")
-    product = ForeignKey(Product, on_delete=CASCADE, related_name='parameters')
+    size = CharField(max_length=8, verbose_name=_("size"))
+    color = CharField(max_length=8, verbose_name=_("color"))
+    available = PositiveSmallIntegerField(verbose_name=_("available"))
+    product = ForeignKey(Product, on_delete=CASCADE, related_name=_('parameters'))
 
     def __str__(self):
         return f"{self.size} {self.color} {self.available}"

@@ -5,8 +5,10 @@ from .models import User, Employee
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-        write_only_fields = ['id', 'password', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'date_joined']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password', 'gender', 'phone', 'photo']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
@@ -22,6 +24,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
-        fields = '__all__'
-        read_only_fields = '__all__'
+        exclude = ['manager']
+        read_only_fields = ['user', 'responsibility', 'salary']
+
 

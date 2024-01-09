@@ -1,6 +1,11 @@
-.PHONY: default push
+.PHONY: default push reset
 
 default: push
+
+reset: clear migrate csu
+
+run:
+	./manage.py runserver $(port)
 
 
 clear:
@@ -17,6 +22,8 @@ clear:
 migrate:
 	./manage.py makemigrations
 	./manage.py migrate
+
+csu:
 	./manage.py createsuperuser --username admin --password 2004 --noinput --email 'ahikmatullayev024@gmail.com'
 
 push:

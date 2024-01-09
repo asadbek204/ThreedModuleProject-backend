@@ -1,74 +1,70 @@
 from rest_framework import serializers
 from account.serializers import UserSerializer
 from home.serializers import ReviewsSerializer
-from .models import Catalog, SubCatalog, Material, Compound, Product, Images, Parameter, ProductReview
-
-
-class CatalogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Catalog
-        fields = '__all__'
-        read_only_fields = '__all__'
+from .models import Catalog, SubCatalog, Material, Compound, Product, Images, Parameter, ProductReview, Description
 
 
 class SubCatalogSerializer(serializers.ModelSerializer):
-    catalog = CatalogSerializer(read_only=True)
-
     class Meta:
         model = SubCatalog
         fields = '__all__'
-        read_only_fields = '__all__'
+        read_only_fields = ['catalog', 'name']
+
+
+class DescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Description
+        fields = '__all__'
+
+
+class CatalogSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Catalog
+        fields = '__all__'
+        read_only_fields = ['name', 'gender']
 
 
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
         fields = '__all__'
-        read_only_fields = '__all__'
+        read_only_fields = ['name', 'fit']
 
 
 class CompoundSerializer(serializers.ModelSerializer):
-    material = MaterialSerializer(read_only=True)
 
     class Meta:
         model = Compound
-        fields = '__all__'
-        read_only_fields = '__all__'
+        exclude = ['material']
+        read_only_fields = ['name', 'percentage']
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    catalog = CatalogSerializer(read_only=True)
-    material = MaterialSerializer(read_only=True)
-
     class Meta:
         model = Product
-        fields = '__all__'
-        read_only_fields = '__all__'
+        exclude = ['material', 'category']
 
 
 class ImagesSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
     class Meta:
         model = Images
-        fields = '__all__'
-        read_only_fields = '__all__'
+        exclude = ['product']
+        read_only_fields = ['image', 'is_main']
 
 
 class ParameterSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = Parameter
-        fields = '__all__'
-        read_only_fields = '__all__'
+        exclude = ['product']
+        read_only_fields = ['size', 'color', 'available']
 
 
 class ProductReviewSerializer(ReviewsSerializer):
     user = UserSerializer(read_only=True)
-    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = ProductReview
-        fields = '__all__'
+        exclude = ['product']
         read_only_fields = ['is_bought']

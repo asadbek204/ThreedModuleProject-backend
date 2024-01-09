@@ -24,7 +24,7 @@ class Employee(Model):
     user = ForeignKey(User, on_delete=CASCADE)
     responsibility = CharField(max_length=32, verbose_name=_('responsibility'))
     salary = PositiveIntegerField(verbose_name=_('salary'))
-    manager = ManyToManyField('self', verbose_name=_('manager'), related_name='employees')
+    manager = ForeignKey('self', blank=True, null=True, verbose_name=_('manager'), related_name='employees', on_delete=DO_NOTHING)
 
     def __str__(self):
         return self.user.username
